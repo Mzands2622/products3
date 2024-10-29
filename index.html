@@ -1,12 +1,16 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <!-- Meta tags for character encoding, viewport, and page title -->
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta charset="utf-8" />
     <title>Assignment #7</title>
+
+    <!-- Link to jQuery library -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
     <style type="text/css">
+      /* CSS for page, layout and design */
       body,
       html {
         margin: 0px;
@@ -114,68 +118,85 @@
     </style>
   </head>
   <body>
-    <h1 id="storeTitle">Matt's Store</h1>
 
+    <!-- Store title -->
+    <h1 id="storeTitle">Matt's Store</h1>
+    
+    <!-- Category selector dropdown, where a user can pick a specific category in order to see a specific set of items -->
     <div id="categorySelector">
       <label id="cateogrySelectionLabel">Select a Category: </label>
       <select id="categoryDropDown"></select>
     </div>
+
+    <!-- Filter button that is utilized to actually apply the category selection chosen by the user-->
     <div id="filterButtonDiv">
         <button id="filterButton">Filter</button>
     </div>
+
+    <!-- Container for displaying the products associated wtih the chosen category -->
     <div id="foundProducts"></div>
     <script>
+      // Fetch the product data from the JSON file
       $.get("products.json", function (info) {
-        let foundStoreInfo = info.store;
-        let foundCategories = new Set();
+        let foundStoreInfo = info.store; // All the found data from the JSON file is stored here
+        let foundCategories = new Set(); // A set is introduced to store all unique categories and avoid duplicates
 
+        // Loop through each product in order to collect every possible unique category
         foundStoreInfo.product.forEach(function (product) {
           product.categories.category.forEach(function (category) {
+            // Remove any trailing commas connected to any categories found in the JSOn file
             if (category.slice(-1) == ",") {
               category = category.slice(0, -1);
             }
+            // Once finalized add the unique category to the initalized set
             foundCategories.add(category);
           });
         });
 
+        // Populate the category drop down shown to the user with all of the found
+        // unique categories from the JSON file
         foundCategories.forEach(function (category) {
             let nextCategory = $("<option></option>");
-            nextCategory.val(category);
-            nextCategory.text(category);
+            nextCategory.val(category); // Set the option value to the category name
+            nextCategory.text(category); // Set the text found in the drop down to the category name
           $("#categoryDropDown").append(nextCategory);
         });
 
+        // Function to display all of the products associated with the chosen cateogry
         function toBeDisplayed(chosenCategory) {
-          $("#foundProducts").empty();
+          $("#foundProducts").empty(); // Clear all the previously shown products when a new category is selected
 
           foundStoreInfo.product.forEach(function (product) {
-            let foundMatch = false;
+            let foundMatch = false; // boolean to keep track if a given product is associated with a selected category
 
+            // Check each of the possible categories assoicated with each product for a possible match
             product.categories.category.forEach(function (category) {
               if (category.slice(-1) == ",") {
-                category = category.slice(0, -1);
+                category = category.slice(0, -1); // Remove the trailing commas associated with any of the category names
               }
 
+              // If a found category matche of a product matchs the selected category set the boolean tracker to true
               if (category == chosenCategory) {
                 foundMatch = true;
               }
             });
 
+            // If a category was found, display the name of the product that is within a category that matches the selected category
             if (foundMatch) {
               let productInfo = '<div class="indvidualPoduct">';
               productInfo += "<h2>" + product.name + "</h2>";
               productInfo += "</div>";
 
-              $("#foundProducts").append(productInfo);
-              toShow = true;
+              $("#foundProducts").append(productInfo); // Append all of the HTML to the container that will display all the necessary information
             }
 
           });
         }
 
+        // Event listener for the the filter button
         $("#filterButton").on("click", function() {
-            let chosenCategory = $('#categoryDropDown').val();
-            toBeDisplayed(chosenCategory);
+            let chosenCategory = $('#categoryDropDown').val(); // Get selected cateogry
+            toBeDisplayed(chosenCategory); // Display the name of the products for that category
         })
       });
     </script>
