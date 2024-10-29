@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="utf-8" />
+    <title>Assignment #7</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <style type="text/css">
+      body,
+      html {
+        margin: 0px;
+        padding: 0px;
+        width: 100%;
+        background-color: #ed7845;
+      }
+
+      #foundProducts {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+      }
+
+      .indvidualPoduct {
+        border: 2px dashed rgb(255, 253, 253);
+        border-radius: 10px;
+        margin-top: 50px;
+        text-align: center;
+        width: 700px;
+      }
+
+      #storeTitle {
+        display: flex;
+        justify-content: center;
+      }
+
+      p {
+        font-size: 20px;
+        color: #6d45b8;
+        font-weight: 800;
+      }
+
+      h2 {
+        color: #081b87;
+      }
+
+      h1 {
+        display: flex;
+        margin-right: auto;
+        margin-left: auto;
+        border: 3px solid rgb(255, 255, 255);
+        border-radius: 10px;
+        width: 30%;
+        padding: 20px;
+        font-style: bold;
+        color: rgb(255, 193, 7);
+      }
+
+      h1:hover {
+        background-color: white;
+      }
+
+      .indvidualPoduct:hover {
+        background-color: white;
+        padding: 10px;
+        opacity: 0.8;
+      }
+
+      #categorySelector {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 25px;
+      }
+
+      #categoryDropDown {
+        padding: 7px;
+        text-align: center;
+        margin-left: 10px;
+        background-color: rgb(20, 90, 102);
+        opacity: 0.8;
+        color: white;
+        border-radius: 5px;
+      }
+
+      #cateogrySelectionLabel {
+        font-size: 20px;
+        font-weight: 800;
+        color: rgb(7, 79, 91);
+      }
+
+      #filterButtonDiv {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 30px;
+      }
+
+      #filterButton {
+        font-size: 17px;
+        color: white;
+        width: 150px;
+        padding: 10px;
+        border-radius: 10px;
+        background-color: rgb(7, 91, 42);
+      }
+
+      #filterButton:hover {
+        background-color: rgb(11, 177, 80);
+        cursor: pointer;
+      }
+
+    </style>
+  </head>
+  <body>
+    <h1 id="storeTitle">Matt's Store</h1>
+
+    <div id="categorySelector">
+      <label id="cateogrySelectionLabel">Select a Category: </label>
+      <select id="categoryDropDown"></select>
+    </div>
+    <div id="filterButtonDiv">
+        <button id="filterButton">Filter</button>
+    </div>
+    <div id="foundProducts"></div>
+    <script>
+      $.get("products.json", function (info) {
+        let foundStoreInfo = info.store;
+        let foundCategories = new Set();
+
+        foundStoreInfo.product.forEach(function (product) {
+          product.categories.category.forEach(function (category) {
+            if (category.slice(-1) == ",") {
+              category = category.slice(0, -1);
+            }
+            foundCategories.add(category);
+          });
+        });
+
+        foundCategories.forEach(function (category) {
+            let nextCategory = $("<option></option>");
+            nextCategory.val(category);
+            nextCategory.text(category);
+          $("#categoryDropDown").append(nextCategory);
+        });
+
+        function toBeDisplayed(chosenCategory) {
+          $("#foundProducts").empty();
+
+          foundStoreInfo.product.forEach(function (product) {
+            let foundMatch = false;
+
+            product.categories.category.forEach(function (category) {
+              if (category.slice(-1) == ",") {
+                category = category.slice(0, -1);
+              }
+
+              if (category == chosenCategory) {
+                foundMatch = true;
+              }
+            });
+
+            if (foundMatch) {
+              let productInfo = '<div class="indvidualPoduct">';
+              productInfo += "<h2>" + product.name + "</h2>";
+              productInfo += "</div>";
+
+              $("#foundProducts").append(productInfo);
+              toShow = true;
+            }
+
+          });
+        }
+
+        $("#filterButton").on("click", function() {
+            let chosenCategory = $('#categoryDropDown').val();
+            toBeDisplayed(chosenCategory);
+        })
+      });
+    </script>
+  </body>
+</html>
